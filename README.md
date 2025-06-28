@@ -32,7 +32,7 @@ wget -O yolov5s-v6.0.pt https://github.com/ultralytics/yolov5/releases/download/
 ```
 
 ## 1. Base Train
-
+Could not use Yolov5sv6.2 widerface trained model. Need to re-train v6.0 and try.
 ```shell
 # YOLOv5s
 python train.py --data data/wider_face.yaml --imgsz 640 --weights yolov5s.pt --cfg models/yolov5s.yaml --epochs 100 --device 0,1 --sync-bn
@@ -45,28 +45,40 @@ python train.py --data data/wider_face.yaml --imgsz 640 --weights yolov5lPP-LC.p
 
 I. Slim (BN-L1)
 ```shell
-# sparse train
+# sparse train using the model trained in step 1
 python train.py --data data/wider_face.yaml --imgsz 640 --weights runs/train/exp/weights/best-coco128-mAP05-02293.pt --cfg models/prunModels/yolov5s-pruning.yaml --epochs 100 --device 0,1 --sparse
 
-# prune
+# prune the sparse trained model in step 2.1.1
 python pruneSlim.py --data data/wider_face.yaml --weights runs/2_sparse-coco128-mAP05-035504.pt --cfg models/prunModels/yolov5s-pruning.yaml --path yolov5s-pruned.yaml --global_percent 0.5 --device 0,1
 
-# finetune
+# finetune the pruned model in step 2.1.2
 python train.py --data data/wider_face.yaml --imgsz 640 --weights runs/3_sparse-coco128-mAP05-035504-Slimpruned.pt --cfg yolov5s-pruned.yaml --epochs 100 --device 0,1
 ```
 
 II. EagleEye (un-test)
+Eagle eye did not work the model trained in step 1. The following error occurs:
+```
+Traceback (most recent call last):
+  File "/workspace/YOLOv5s-Compression/pruneEagleEye.py", line 123, in <module>
+    model.load_state_dict(state_dict, strict=True)       # load strictly
+  File "/venv/main/lib/python3.10/site-packages/torch/nn/modules/module.py", line 2584, in load_state_dict
+    raise RuntimeError(
+RuntimeError: Error(s) in loading state_dict for Model:
+	Missing key(s) in state_dict: "model.24.m.0.weight", "model.24.m.0.bias", "model.24.m.1.weight", "model.24.m.1.bias", "model.24.m.2.weight", "model.24.m.2.bias".
+```
+Skipping eagle eye for now
+
 ```shell
-# search best sub-net
+# search best sub-net. Prune the sparse trained model in step 2.1.1
 python pruneEagleEye.py --data data/wider_face.yaml --weights runs/1_base-coco128-mAP05-02293.pt --cfg models/prunModels/yolov5s-pruning.yaml  --path yolov5s-pruned-eagleeye.yaml --max_iter 100 --remain_ratio 0.5 --delta 0.02
 
-# finetune
+# finetune the pruned model in step 2.2.1
 python train.py --data data/wider_face.yaml --imgsz 640 --weights runs/3_base-coco128-mAP05-02293-EagleEyepruned.pt --cfg yolov5s-pruned-eagleeye.yaml --epochs 100 --device 0,1
 ```
 
 
 ## 5. Quantization PTQ
-
+Copy the pruned model from step 2.1 to its named directory.
 ```shell
 cd yolov5_quant_sample
 cp *.pt weights/SlimPrune
@@ -74,9 +86,24 @@ cp *.pt weights/EagleEye
 ```
 
 5.1 export onnx
+Export the slimPruned model to ONNX
 ```shell
 python models/export.py --weights weights/SlimPrune/Finetune-coco128-mAP05_0.0810-Slimpruned_0.5.pt --img 640 --batch 1 --device 0,1 
 ```
+This error occured when trying to export the model to ONNX
+```
+Traceback (most recent call last):
+  File "/workspace/YOLOv5s-Compression/models/export.py", line 38, in <module>
+    model = attempt_load(opt.weights, map_location=device)  # load FP32 model
+  File "/workspace/YOLOv5s-Compression/./models/experimental.py", line 96, in attempt_load
+    model.append(ckpt['ema' if ckpt.get('ema') else 'model'].float().fuse().eval())  # FP32 model
+  File "/workspace/YOLOv5s-Compression/./models/yolo.py", line 225, in fuse
+    m.conv = fuse_conv_and_bn(m.conv, m.bn)  # update conv
+  File "/workspace/YOLOv5s-Compression/./utils/torch_utils.py", line 209, in fuse_conv_and_bn
+    w_conv = conv.weight.clone().view(conv.out_channels, -1)
+RuntimeError: shape '[66, -1]' is invalid for input of size 33984
+```
+
 5.2 Build a int8 engine using TensorRT's native PTQ
 ```shell
 rm trt/yolov5s_calibration.cache
