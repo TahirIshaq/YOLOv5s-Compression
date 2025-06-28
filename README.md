@@ -13,25 +13,20 @@ pip install -r requirments-01.txt
 
 ## Download data and weight
 ```shell
-# download dataset
-cd ../{project}
-mkdir -p datasets/coco128
+# Prepare widerface dataset
+python3 prepare_dataset.py
 
-coco128
-链接: https://pan.baidu.com/s/1ya6SAFGp6du5RahaU1BlkA?pwd=jufh
-提取码: jufh 
+data
+├── train
+│   └── images
+│   └── labels
+├── val
+│   └── images
+│   └── labels
+├── wider_face.yaml
 
-datasets/
-├── coco128
-│   ├── images
-│   │   └── train2017
-│   ├── labels
-│   │   └── train2017
-│   ├── LICENSE
-│   └── README.txt
 
 # download pre-trained weights
-cd {project}
 wget -O yolov5s-v5.0.pt https://github.com/ultralytics/yolov5/releases/download/v5.0/yolov5s.pt
 wget -O yolov5s-v6.0.pt https://github.com/ultralytics/yolov5/releases/download/v6.0/yolov5s.pt
 ```
@@ -40,10 +35,10 @@ wget -O yolov5s-v6.0.pt https://github.com/ultralytics/yolov5/releases/download/
 
 ```shell
 # YOLOv5s
-python train.py --data data/coco128.yaml --imgsz 640 --weights yolov5s.pt --cfg models/yolov5s.yaml --epochs 100 --device 0,1 --sync-bn
+python train.py --data data/wider_face.yaml --imgsz 640 --weights yolov5s.pt --cfg models/yolov5s.yaml --epochs 100 --device 0,1 --sync-bn
 
 # [Optional] YOLOv5l-PP-LCNet
-python train.py --data data/coco128.yaml --imgsz 640 --weights yolov5lPP-LC.pt --cfg models/lightModels/yolov5lPP-LC.yaml --epochs 60 --device 0,1 --sync-bn
+python train.py --data data/wider_face.yaml --imgsz 640 --weights yolov5lPP-LC.pt --cfg models/lightModels/yolov5lPP-LC.yaml --epochs 60 --device 0,1 --sync-bn
 ```
 
 ## 2. Sparse train
@@ -51,22 +46,22 @@ python train.py --data data/coco128.yaml --imgsz 640 --weights yolov5lPP-LC.pt -
 I. Slim (BN-L1)
 ```shell
 # sparse train
-python train.py --data data/coco128.yaml --imgsz 640 --weights runs/train/exp/weights/best-coco128-mAP05-02293.pt --cfg models/prunModels/yolov5s-pruning.yaml --epochs 100 --device 0,1 --sparse
+python train.py --data data/wider_face.yaml --imgsz 640 --weights runs/train/exp/weights/best-coco128-mAP05-02293.pt --cfg models/prunModels/yolov5s-pruning.yaml --epochs 100 --device 0,1 --sparse
 
 # prune
-python pruneSlim.py --data data/coco128.yaml --weights runs/2_sparse-coco128-mAP05-035504.pt --cfg models/prunModels/yolov5s-pruning.yaml --path yolov5s-pruned.yaml --global_percent 0.5 --device 0,1
+python pruneSlim.py --data data/wider_face.yaml --weights runs/2_sparse-coco128-mAP05-035504.pt --cfg models/prunModels/yolov5s-pruning.yaml --path yolov5s-pruned.yaml --global_percent 0.5 --device 0,1
 
 # finetune
-python train.py --data data/coco128.yaml --imgsz 640 --weights runs/3_sparse-coco128-mAP05-035504-Slimpruned.pt --cfg yolov5s-pruned.yaml --epochs 100 --device 0,1
+python train.py --data data/wider_face.yaml --imgsz 640 --weights runs/3_sparse-coco128-mAP05-035504-Slimpruned.pt --cfg yolov5s-pruned.yaml --epochs 100 --device 0,1
 ```
 
 II. EagleEye (un-test)
 ```shell
 # search best sub-net
-python pruneEagleEye.py --data data/coco128.yaml --weights runs/1_base-coco128-mAP05-02293.pt --cfg models/prunModels/yolov5s-pruning.yaml  --path yolov5s-pruned-eagleeye.yaml --max_iter 100 --remain_ratio 0.5 --delta 0.02
+python pruneEagleEye.py --data data/wider_face.yaml --weights runs/1_base-coco128-mAP05-02293.pt --cfg models/prunModels/yolov5s-pruning.yaml  --path yolov5s-pruned-eagleeye.yaml --max_iter 100 --remain_ratio 0.5 --delta 0.02
 
 # finetune
-python train.py --data data/coco128.yaml --imgsz 640 --weights runs/3_base-coco128-mAP05-02293-EagleEyepruned.pt --cfg yolov5s-pruned-eagleeye.yaml --epochs 100 --device 0,1
+python train.py --data data/wider_face.yaml --imgsz 640 --weights runs/3_base-coco128-mAP05-02293-EagleEyepruned.pt --cfg yolov5s-pruned-eagleeye.yaml --epochs 100 --device 0,1
 ```
 
 
@@ -103,8 +98,8 @@ python trt/trt_test.py --model weights/EagleEye/Finetune_coco128-mAP05_0.0860-Ea
 
 ```shell
 # QAT-finetuning
-python yolo_quant_flow.py --data data/coco128.yaml --cfg models/yolov5s.yaml --ckpt-path weights/SlimPrune/Finetune-coco128-mAP05_0.0810-Slimpruned_0.5.pt --hyp data//hyp.qat.yaml --skip-layers
-python yolo_quant_flow.py --data data/coco128.yaml --cfg models/yolov5s.yaml --ckpt-path weights/EagleEye/Finetune_coco128-mAP05_0.0860-EagleEyepruned.pt --hyp data//hyp.qat.yaml --skip-layers
+python yolo_quant_flow.py --data data/wider_face.yaml --cfg models/yolov5s.yaml --ckpt-path weights/SlimPrune/Finetune-coco128-mAP05_0.0810-Slimpruned_0.5.pt --hyp data//hyp.qat.yaml --skip-layers
+python yolo_quant_flow.py --data data/wider_face.yaml --cfg models/yolov5s.yaml --ckpt-path weights/EagleEye/Finetune_coco128-mAP05_0.0860-EagleEyepruned.pt --hyp data//hyp.qat.yaml --skip-layers
 
 # Build TensorRT engine
 python trt/onnx_to_trt.py --model weights/SlimPrune/Finetune-coco128-mAP05_0.0810-Slimpruned_0.5_skip4.onnx --dtype int8 --qat
