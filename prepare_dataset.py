@@ -115,7 +115,7 @@ if __name__ == "__main__":
     convert_to_yolov5_format(wider_face_val, dst_dir=Path("data/val"))
     #convert_to_yolov5_format(wider_face_test, dst_dir=Path("./yolov5/data/test"))
 
-    create_yolov5_dataset_yaml("data/train", "data/val", "data/val")
+    create_yolov5_dataset_yaml("data/train", "data/val")
 
     #sys.path.append('yolov5')
     #attempt_download('yolov5/weights/yolov5s.pt')

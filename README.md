@@ -184,6 +184,15 @@ Speed: 0.3ms pre-process, 1.5ms inference, 0.7ms NMS per image at shape (1, 3, 6
 - [ ] Distillation
 
 
+## Changes made to comply with new library versions
+- https://github.com/ultralytics/yolov5/pull/8067/files
+- https://github.com/tensorflow/models/issues/11040#issuecomment-1685593292
+- https://numpy.org/devdocs/release/1.20.0-notes.html#deprecations
+- https://docs.pytorch.org/docs/stable/generated/torch.load.html#torch.load
+- https://docs.pytorch.org/docs/stable/amp.html
+
+
+
 ## Acknowledge
 > https://github.com/Gumpest/YOLOv5-Multibackbone-Compression  
 > https://github.com/maggiez0138/yolov5_quant_sample  
