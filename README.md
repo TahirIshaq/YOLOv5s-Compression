@@ -8,7 +8,7 @@ conda create -n yolov5 python=3.9
 conda activate yolov5
 
 # pip
-pip install -r requirments-01.txt
+pip install -r requirements-01.txt
 ```
 
 ## Download data and weight
