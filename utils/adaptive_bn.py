@@ -103,7 +103,7 @@ class AdaptiveBNEval(object):
         t0 = time.time()
         maps = np.zeros(nc)  # mAP per class
         results = (0, 0, 0, 0, 0, 0, 0)  # P, R, mAP@.5, mAP@.5-.95, val_loss(box, obj, cls)
-        scaler = amp.GradScaler(enabled=cuda)
+        scaler = torch.amp.GradScaler('cuda')
         compute_loss = ComputeLoss(model)  # init loss class
         epoch = 0
 
