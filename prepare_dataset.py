@@ -64,7 +64,7 @@ def download_dataset(show_example: bool = False):
         plt.show()
 
     #return wider_face_train, wider_face_val, wider_face_test
-    return wider_face_train, wider_face_val, wider_face_test
+    return wider_face_train, wider_face_val
 
 
 def _write_files(data_point, dst_dir: Path, i: int):
