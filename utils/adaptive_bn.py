@@ -122,7 +122,7 @@ class AdaptiveBNEval(object):
                 imgs = imgs.to(self.device, non_blocking=True).float() / 255.0  # uint8 to float32, 0-255 to 0.0-1.0
 
                 # Forward
-                with amp.autocast(enabled=self.cuda):
+                with torch.amp.autocast('cuda'):
                     pred = compact_model(imgs)  # forward
                     # loss, loss_items = compute_loss(pred, targets.to(device))  # loss scaled by batch_size
                 
