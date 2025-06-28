@@ -197,3 +197,6 @@ Speed: 0.3ms pre-process, 1.5ms inference, 0.7ms NMS per image at shape (1, 3, 6
 > https://github.com/Gumpest/YOLOv5-Multibackbone-Compression  
 > https://github.com/maggiez0138/yolov5_quant_sample  
 > https://github.com/Syencil/mobile-yolov5-pruning-distillation
+> https://lambda.ai/blog/training-a-yolov5-object-detector-on-lambda-cloud
+> https://github.com/LambdaLabsML/examples/blob/main/yolov5/prepare_dataset.py
+
