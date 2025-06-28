@@ -6,7 +6,7 @@ coremltools
 matplotlib
 numpy
 onnx
-onnx_simplifier
+#onnx_simplifier
 onnxruntime
 #onnxruntime_gpu==1.8.0
 onnxsim
