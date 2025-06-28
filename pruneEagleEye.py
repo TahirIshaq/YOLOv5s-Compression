@@ -116,7 +116,7 @@ if __name__ == '__main__':
 
     # Create model
     model = Model(opt.cfg).to(device)
-    ckpt = torch.load(opt.weights, map_location=device)  
+    ckpt = torch.load(opt.weights, weights_only=False, map_location=device)  
     exclude = []                                         # exclude keys
     state_dict = ckpt['model'].float().state_dict()      # to FP32
     state_dict = intersect_dicts(state_dict, model.state_dict(), exclude=exclude)  # intersect

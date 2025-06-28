@@ -118,7 +118,7 @@ def prepare_model(calibrator, hyp, opt, device):
 
     pretrained = opt.weights.endswith('.pt')
     if pretrained:
-        ckpt = torch.load(opt.weights, map_location=device)  # load checkpoint
+        ckpt = torch.load(opt.weights, weights_only=False, map_location=device)  # load checkpoint
         model = Model(opt.cfg or ckpt['model'].yaml, ch=3, nc=nc, anchors=hyp.get('anchors')).to(device)  # create
         exclude = ['anchor'] if (opt.cfg or hyp.get('anchors')) and not opt.resume else []  # exclude keys
         state_dict = ckpt['model'].float().state_dict()  # to FP32
