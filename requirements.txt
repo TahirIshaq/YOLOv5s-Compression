@@ -6,7 +6,7 @@ coremltools
 matplotlib
 numpy
 onnx
-#onnx_simplifier
+onnx_simplifier
 onnxruntime
 #onnxruntime_gpu==1.8.0
 onnxsim
@@ -25,6 +25,7 @@ setuptools
 #tensorflow==2.11.0
 #tensorflowjs==4.2.0
 #tensorrt==8.5.3.1
+tensorboard
 thop
 timm
 #torch==1.11.0+cu115

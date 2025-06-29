@@ -1,4 +1,4 @@
-nc: 80
+nc: 1
 depth_multiple: 0.33
 width_multiple: 0.5
 anchors: 
